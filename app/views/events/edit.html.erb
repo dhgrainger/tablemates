@@ -1,0 +1,14 @@
+<% content_for :title, "Edit party" %>
+
+<div class="mb-6 flex items-center justify-between gap-3">
+  <h1 class="text-3xl font-semibold">Edit party</h1>
+  <%= link_to "Cancel", party_path(@event), class: "btn btn-ghost btn-sm" %>
+</div>
+
+<%= render "form", event: @event %>
+
+<div class="mt-10 border-t border-base-300 pt-6">
+  <%= button_to "Delete this party", event_path(@event), method: :delete,
+        class: "btn btn-outline btn-error btn-block",
+        data: { turbo_confirm: "Delete this party and everything in it? This can't be undone." } %>
+</div>

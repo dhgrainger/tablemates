@@ -1,0 +1,51 @@
+# Dinner at Alex's
+alex_at_dinner:
+  event: dinner
+  user: alex
+  guest_name: Alex Host
+  access_token: alex-dinner-access-token
+  rsvp_status: "yes"
+  venmo_username: alex-host
+
+bea:
+  event: dinner
+  guest_name: Bea Baker
+  email: bea@example.com
+  access_token: bea-dinner-access-token0
+  rsvp_status: "yes"
+  venmo_username: bea-baker
+
+cal:
+  event: dinner
+  guest_name: Cal Cook
+  access_token: cal-dinner-access-token0
+  rsvp_status: "yes"
+
+dee:
+  event: dinner
+  guest_name: Dee Diner
+  access_token: dee-dinner-access-token0
+  rsvp_status: maybe
+
+# Sam's Brunch
+sam_at_brunch:
+  event: brunch
+  user: sam
+  guest_name: Sam Other
+  access_token: sam-brunch-access-token0
+  rsvp_status: "yes"
+  venmo_username: sam-other
+
+eve:
+  event: brunch
+  guest_name: Eve Elsewhere
+  access_token: eve-brunch-access-token0
+  rsvp_status: "yes"
+  venmo_username: eve-elsewhere
+
+alex_at_old_bbq:
+  event: old_bbq
+  user: alex
+  guest_name: Alex Host
+  access_token: alex-bbq-access-token000
+  rsvp_status: "yes"

@@ -1,0 +1,53 @@
+<%= render FormErrorsComponent.new(record: event) %>
+
+<%= form_with model: event, class: "flex flex-col gap-4" do |form| %>
+  <label class="flex flex-col gap-1">
+    <span class="font-medium">What's the occasion?</span>
+    <%= form.text_field :title, required: true, maxlength: 80, placeholder: "Dinner at Alex's", class: "input input-lg w-full" %>
+  </label>
+
+  <label class="flex flex-col gap-1">
+    <span class="font-medium">When</span>
+    <%= form.datetime_local_field :starts_at, required: true, class: "input input-lg w-full" %>
+  </label>
+
+  <label class="flex flex-col gap-1">
+    <span class="font-medium">Where <span class="font-normal opacity-70">(optional)</span></span>
+    <%= form.text_field :location, maxlength: 200, placeholder: "12 Orchard Lane", class: "input input-lg w-full" %>
+  </label>
+
+  <label class="flex flex-col gap-1">
+    <span class="font-medium">Details <span class="font-normal opacity-70">(optional)</span></span>
+    <%= form.text_area :description, rows: 4, maxlength: 2000, placeholder: "Theme, what to bring, parking…", class: "textarea textarea-lg w-full" %>
+  </label>
+
+  <label class="flex flex-col gap-1">
+    <span class="font-medium">Cover photo <span class="font-normal opacity-70">(optional)</span></span>
+    <%= form.file_field :cover_image, accept: ImageAttachmentValidator::CONTENT_TYPES.join(","), class: "file-input w-full" %>
+    <span class="text-sm opacity-70">PNG, JPEG, WebP or GIF, up to 5 MB</span>
+  </label>
+
+  <details class="collapse collapse-arrow border border-base-300 bg-base-100" <%= "open" if event.round_to_whole_dollars? || event.forgive_under_cents != 0 %>>
+    <summary class="collapse-title font-medium">Splitting options</summary>
+    <div class="collapse-content flex flex-col gap-4">
+      <label class="flex items-center justify-between gap-3">
+        <span>
+          <span class="font-medium">Round payments to whole dollars</span>
+          <span class="block text-sm opacity-70">You absorb the few cents of difference</span>
+        </span>
+        <%= form.check_box :round_to_whole_dollars, class: "toggle toggle-primary" %>
+      </label>
+
+      <label class="flex flex-col gap-1">
+        <span class="font-medium">Forgive payments under</span>
+        <label class="input w-full">
+          <span class="opacity-60">$</span>
+          <%= form.text_field :forgive_under, inputmode: "decimal", class: "grow" %>
+        </label>
+        <span class="text-sm opacity-70">Tiny debts below this aren't worth a payment. Leave at 0.00 to collect everything.</span>
+      </label>
+    </div>
+  </details>
+
+  <%= form.submit event.new_record? ? "Create party" : "Save changes", class: "btn btn-primary btn-lg btn-block mt-2" %>
+<% end %>

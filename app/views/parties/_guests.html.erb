@@ -1,0 +1,15 @@
+<%= render CardComponent.new(title: "Who's coming", id: "guest_list") do %>
+  <ul class="flex flex-col gap-3">
+    <% invitations.each do |invitation| %>
+      <li class="flex items-center gap-3" id="<%= dom_id(invitation) %>">
+        <%= render AvatarComponent.new(name: invitation.guest_name) %>
+        <span class="min-w-0 grow truncate font-medium">
+          <%= invitation.guest_name %>
+          <% if invitation.host? %><span class="font-normal opacity-60">· host</span><% end %>
+          <% if invitation == current_invitation %><span class="font-normal opacity-60">· you</span><% end %>
+        </span>
+        <%= render RsvpBadgeComponent.new(status: invitation.rsvp_status) %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

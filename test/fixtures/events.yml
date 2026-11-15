@@ -1,0 +1,22 @@
+dinner:
+  host: alex
+  title: Dinner at Alex's
+  description: Pasta night. Bring an appetite.
+  starts_at: <%= 5.days.from_now.change(hour: 19).to_fs(:db) %>
+  location: 12 Orchard Lane
+  invite_token: dinner-invite-token-0000
+  status: planning
+
+brunch:
+  host: sam
+  title: Sam's Brunch
+  starts_at: <%= 9.days.from_now.change(hour: 11).to_fs(:db) %>
+  invite_token: brunch-invite-token-0000
+  status: planning
+
+old_bbq:
+  host: alex
+  title: Summer BBQ
+  starts_at: <%= 60.days.ago.change(hour: 17).to_fs(:db) %>
+  invite_token: old-bbq-invite-token-000
+  status: planning

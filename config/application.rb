@@ -16,6 +16,9 @@ module Tablemates
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
+    # Party times are entered and shown in a single zone for now.
+    config.time_zone = ENV.fetch("APP_TIME_ZONE", "Eastern Time (US & Canada)")
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

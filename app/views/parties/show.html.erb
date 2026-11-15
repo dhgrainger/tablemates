@@ -1,0 +1,6 @@
+<% content_for :title, @event.title %>
+
+<div class="flex flex-col gap-4">
+  <%= render "parties/details", event: @event %>
+  <%= render "parties/guests", event: @event, invitations: @invitations %>
+</div>
