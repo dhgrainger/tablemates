@@ -1,0 +1,58 @@
+<%# locals: (event:, contribution:) %>
+<%= render FormErrorsComponent.new(record: contribution) %>
+
+<%= form_with model: contribution,
+      url: contribution.new_record? ? party_contributions_path(event) : party_contribution_path(event, contribution),
+      class: "flex flex-col gap-4" do |form| %>
+  <label class="flex flex-col gap-1">
+    <span class="font-medium">What is it?</span>
+    <%= form.text_field :name, required: true, maxlength: 80, placeholder: "Garlic bread", class: "input input-lg w-full" %>
+  </label>
+
+  <label class="flex flex-col gap-1">
+    <span class="font-medium">Category</span>
+    <%= form.select :category, Contribution::CATEGORIES.invert.to_a, {}, class: "select select-lg w-full" %>
+  </label>
+
+  <% if contribution.new_record? && hosting? %>
+    <label class="flex items-center justify-between gap-3 rounded-box border border-base-300 bg-base-100 p-4">
+      <span>
+        <span class="font-medium">I'm bringing this myself</span>
+        <span class="block text-sm opacity-70">Leave off to list it for a guest to claim</span>
+      </span>
+      <%= check_box_tag "contribution[mine]", "1", params.dig(:contribution, :mine) == "1", class: "toggle toggle-primary" %>
+    </label>
+  <% end %>
+
+  <% if contribution.claimed? && !(contribution.new_record? && hosting?) %>
+    <label class="flex flex-col gap-1">
+      <span class="font-medium">What did it cost? <span class="font-normal opacity-70">(add after shopping)</span></span>
+      <label class="input input-lg w-full">
+        <span class="opacity-60">$</span>
+        <%= form.text_field :cost, inputmode: "decimal", placeholder: "0.00", class: "grow" %>
+      </label>
+    </label>
+
+    <label class="flex flex-col gap-1">
+      <span class="font-medium">Receipt photo <span class="font-normal opacity-70">(optional)</span></span>
+      <% if saved_attachment?(contribution.receipt) %>
+        <span class="flex items-center gap-3">
+          <%= link_to "🧾 View current receipt", party_contribution_receipt_path(event, contribution), class: "link", target: "_blank", rel: "noopener" %>
+          <label class="flex items-center gap-2 text-sm"><%= check_box_tag "contribution[remove_receipt]", "1", false, class: "checkbox checkbox-sm" %> Remove</label>
+        </span>
+      <% end %>
+      <%= form.file_field :receipt, accept: ImageAttachmentValidator::CONTENT_TYPES.join(","), class: "file-input w-full" %>
+      <span class="text-sm opacity-70">PNG, JPEG, WebP or GIF, up to 10 MB</span>
+    </label>
+
+    <label class="flex items-center justify-between gap-3 rounded-box border border-base-300 bg-base-100 p-4">
+      <span>
+        <span class="font-medium">It's a gift</span>
+        <span class="block text-sm opacity-70">My treat — leave it out of the split</span>
+      </span>
+      <%= form.check_box :gift, class: "toggle toggle-secondary" %>
+    </label>
+  <% end %>
+
+  <%= form.submit contribution.new_record? ? "Add to the board" : "Save", class: "btn btn-primary btn-lg btn-block mt-2" %>
+<% end %>

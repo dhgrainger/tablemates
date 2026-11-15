@@ -1,5 +1,6 @@
 class Event < ApplicationRecord
   belongs_to :host, class_name: "User"
+  has_many :contributions, dependent: :destroy
   has_many :invitations, dependent: :destroy
   has_one_attached :cover_image
 
@@ -18,6 +19,10 @@ class Event < ApplicationRecord
 
   after_create :invite_host
 
+  # Everyone looking at the party page gets a Turbo page refresh (morphed)
+  # whenever the party changes. Invitations and contributions touch the event.
+  broadcasts_refreshes
+
   scope :upcoming, -> { where(starts_at: Time.current.beginning_of_day..).order(:starts_at) }
   scope :past, -> { where(starts_at: ...Time.current.beginning_of_day).order(starts_at: :desc) }
 
@@ -29,6 +34,10 @@ class Event < ApplicationRecord
 
   def attendees
     invitations.rsvp_yes.order(:id)
+  end
+
+  def shared_total_cents
+    contributions.splittable.sum(:cost_cents)
   end
 
   # Dollars-as-text accessor for forms.

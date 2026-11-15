@@ -5,6 +5,7 @@ class Invitation < ApplicationRecord
 
   belongs_to :event, touch: true
   belongs_to :user, optional: true
+  has_many :contributions, dependent: :nullify
 
   has_secure_token :access_token
 

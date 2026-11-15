@@ -1,0 +1,37 @@
+<section class="card border border-base-300 bg-base-100" id="board">
+  <div class="card-body gap-4 p-5">
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="card-title text-xl">What's on the table</h2>
+      <% if @event.planning? %>
+        <%= link_to "Add an item", helpers.new_party_contribution_path(@event), class: "btn btn-primary btn-sm" %>
+      <% end %>
+    </div>
+
+    <% if @contributions.empty? %>
+      <p class="rounded-box border border-dashed border-base-300 p-6 text-center opacity-70">
+        Nothing yet. <%= @viewer.host? ? "List what you need, or what you're making." : "Add what you're bringing." %>
+      </p>
+    <% end %>
+
+    <% groups.each do |label, contributions| %>
+      <div>
+        <h3 class="mb-2 text-sm font-semibold uppercase tracking-wide opacity-60"><%= label %></h3>
+        <ul class="flex flex-col divide-y divide-base-300 rounded-box border border-base-300">
+          <% contributions.each do |contribution| %>
+            <%= render ContributionRowComponent.new(contribution: contribution, viewer: @viewer, event: @event) %>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <% if @contributions.any? %>
+      <div class="flex items-center justify-between border-t border-base-300 pt-3">
+        <span class="opacity-80">
+          Shared cost so far
+          <% if still_needed > 0 %><span class="block text-sm opacity-70"><%= pluralize(still_needed, "item") %> still needed</span><% end %>
+        </span>
+        <span class="text-xl font-semibold" id="shared_total"><%= helpers.money(total_cents) %></span>
+      </div>
+    <% end %>
+  </div>
+</section>

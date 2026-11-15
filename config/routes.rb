@@ -9,6 +9,13 @@ Rails.application.routes.draw do
   # The party itself, for the host and for guests
   resources :parties, only: :show do
     resource :rsvp, only: %i[ edit update ]
+    resources :contributions, only: %i[ new create edit update destroy ] do
+      member do
+        patch :claim
+        patch :unclaim
+      end
+      resource :receipt, only: :show
+    end
   end
 
   # Guest access — no accounts. The invite link is shared; /p/ links are personal.

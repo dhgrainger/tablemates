@@ -1,0 +1,21 @@
+<% content_for :title, @contribution.name_was %>
+
+<div class="mb-6 flex items-center justify-between gap-3">
+  <h1 class="text-3xl font-semibold"><%= @contribution.name_was %></h1>
+  <%= link_to "Cancel", party_path(@event, anchor: "board"), class: "btn btn-ghost btn-sm" %>
+</div>
+
+<% if @contribution.claimed? && @contribution.invitation_id != current_invitation.id %>
+  <p class="mb-4 opacity-80"><%= @contribution.invitation.guest_name %> is bringing this.</p>
+<% end %>
+
+<%= render "form", event: @event, contribution: @contribution %>
+
+<div class="mt-10 flex flex-col gap-3 border-t border-base-300 pt-6">
+  <% if @contribution.claimed? && @contribution.cost_cents_was.zero? %>
+    <%= button_to @contribution.invitation_id == current_invitation.id ? "I can't bring this after all" : "Put back on the list",
+          unclaim_party_contribution_path(@event, @contribution), method: :patch, class: "btn btn-block" %>
+  <% end %>
+  <%= button_to "Remove from the board", party_contribution_path(@event, @contribution), method: :delete,
+        class: "btn btn-outline btn-error btn-block", data: { turbo_confirm: "Remove this item from the board?" } %>
+</div>

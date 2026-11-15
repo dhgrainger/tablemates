@@ -1,0 +1,46 @@
+pasta:
+  event: dinner
+  invitation: alex_at_dinner
+  name: Fresh pasta and sauce
+  category: mains
+  cost_cents: 6000
+  shared: true
+
+wine:
+  event: dinner
+  invitation: bea
+  name: Two bottles of red
+  category: drinks
+  cost_cents: 3000
+  shared: true
+
+flowers:
+  event: dinner
+  invitation: cal
+  name: Flowers for the table
+  category: other
+  cost_cents: 1500
+  shared: false
+
+salad:
+  event: dinner
+  name: Green salad
+  category: sides
+  cost_cents: 0
+  shared: true
+
+tiramisu:
+  event: dinner
+  invitation: cal
+  name: Tiramisu
+  category: dessert
+  cost_cents: 0
+  shared: true
+
+bagels:
+  event: brunch
+  invitation: eve
+  name: Bagels
+  category: mains
+  cost_cents: 2000
+  shared: true

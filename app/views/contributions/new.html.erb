@@ -1,0 +1,8 @@
+<% content_for :title, "Add an item" %>
+
+<div class="mb-6 flex items-center justify-between gap-3">
+  <h1 class="text-3xl font-semibold"><%= hosting? ? "Add an item" : "What are you bringing?" %></h1>
+  <%= link_to "Cancel", party_path(@event, anchor: "board"), class: "btn btn-ghost btn-sm" %>
+</div>
+
+<%= render "form", event: @event, contribution: @contribution %>
