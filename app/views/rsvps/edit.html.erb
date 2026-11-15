@@ -1,0 +1,13 @@
+<% content_for :title, "Your details" %>
+
+<div class="mb-6 flex items-center justify-between gap-3">
+  <h1 class="text-3xl font-semibold">Your details</h1>
+  <%= link_to "Cancel", party_path(@event), class: "btn btn-ghost btn-sm" %>
+</div>
+
+<%= render FormErrorsComponent.new(record: current_invitation) %>
+
+<%= form_with model: current_invitation, url: party_rsvp_path(@event), class: "flex flex-col gap-4" do |form| %>
+  <%= render "shared/rsvp_fields", form: form, reply: @event.planning? && !hosting? %>
+  <%= form.submit "Save", class: "btn btn-primary btn-lg btn-block mt-2" %>
+<% end %>

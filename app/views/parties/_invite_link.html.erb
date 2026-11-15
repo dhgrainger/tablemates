@@ -1,0 +1,7 @@
+<%# locals: (event:) %>
+<%# Host only. %>
+<%= render CardComponent.new(title: "Invite your guests", id: "invite_link") do %>
+  <p class="opacity-80">Share this link. Guests RSVP without creating an account.</p>
+  <input type="text" readonly value="<%= invite_url(event.invite_token) %>" class="input w-full text-sm" aria-label="Invite link" onfocus="this.select()">
+  <%= render CopyButtonComponent.new(text: invite_url(event.invite_token), label: "Copy invite link", style: "btn-primary btn-block") %>
+<% end %>

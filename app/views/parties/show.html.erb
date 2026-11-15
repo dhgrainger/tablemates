@@ -1,6 +1,8 @@
 <% content_for :title, @event.title %>
 
 <div class="flex flex-col gap-4">
-  <%= render "parties/details", event: @event %>
+  <%= render "parties/details", event: @event, hosting: hosting? %>
+  <%= render "parties/you", event: @event, invitation: current_invitation %>
+  <%= render "parties/invite_link", event: @event if hosting? && @event.planning? %>
   <%= render "parties/guests", event: @event, invitations: @invitations %>
 </div>

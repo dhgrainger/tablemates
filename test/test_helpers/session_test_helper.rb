@@ -17,3 +17,15 @@ end
 ActiveSupport.on_load(:action_dispatch_integration_test) do
   include SessionTestHelper
 end
+
+module GuestTestHelper
+  # Opens the guest's personal link, which remembers them via the signed cookie.
+  def visit_as_guest(invitation)
+    get guest_access_path(invitation.access_token)
+    assert_redirected_to party_path(invitation.event)
+  end
+end
+
+ActiveSupport.on_load(:action_dispatch_integration_test) do
+  include GuestTestHelper
+end

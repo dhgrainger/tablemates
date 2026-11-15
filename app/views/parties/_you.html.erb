@@ -1,0 +1,24 @@
+<%# locals: (event:, invitation:) %>
+<%# Only ever rendered for the viewer's own invitation: it contains their personal link. %>
+<%= render CardComponent.new(id: "your_rsvp") do |card| %>
+  <div class="flex items-center gap-3">
+    <%= render AvatarComponent.new(name: invitation.guest_name, size: :lg) %>
+    <div class="min-w-0 grow">
+      <p class="truncate text-lg font-semibold"><%= invitation.guest_name %></p>
+      <p class="text-sm opacity-80">
+        <% if invitation.venmo_username %>Venmo @<%= invitation.venmo_username %><% else %>No Venmo username yet<% end %>
+      </p>
+    </div>
+    <%= render RsvpBadgeComponent.new(status: invitation.rsvp_status) %>
+  </div>
+
+  <div class="flex flex-wrap gap-2">
+    <%= link_to invitation.host? ? "Edit my details" : "Change RSVP or details", edit_party_rsvp_path(event), class: "btn btn-sm" %>
+    <% unless invitation.host? %>
+      <%= render CopyButtonComponent.new(text: guest_access_url(invitation.access_token), label: "Copy my personal link") %>
+    <% end %>
+  </div>
+  <% unless invitation.host? %>
+    <p class="text-sm opacity-70">Your personal link opens this party as you on another device. Don't share it.</p>
+  <% end %>
+<% end %>

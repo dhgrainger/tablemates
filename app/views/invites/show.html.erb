@@ -1,0 +1,21 @@
+<% content_for :title, @event.title %>
+
+<div class="flex flex-col gap-4">
+  <p class="text-center font-medium opacity-80">💌 <%= @event.host.name %> invited you</p>
+
+  <%= render "parties/details", event: @event %>
+
+  <% if @event.planning? %>
+    <%= render CardComponent.new(title: "RSVP", id: "rsvp") do %>
+      <%= render FormErrorsComponent.new(record: @invitation) %>
+
+      <%= form_with model: @invitation, url: invite_path(@event.invite_token), class: "flex flex-col gap-4" do |form| %>
+        <%= render "shared/rsvp_fields", form: form %>
+        <%= form.submit "Send RSVP", class: "btn btn-primary btn-lg btn-block mt-2" %>
+      <% end %>
+      <p class="text-center text-sm opacity-70">No account needed.</p>
+    <% end %>
+  <% else %>
+    <div role="alert" class="alert alert-soft">This party has wrapped up, so RSVPs are closed.</div>
+  <% end %>
+</div>
