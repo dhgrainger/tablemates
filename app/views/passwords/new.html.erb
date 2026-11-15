@@ -1,0 +1,12 @@
+<% content_for :title, "Reset password" %>
+
+<h1 class="mb-6 text-3xl font-semibold">Forgot your password?</h1>
+
+<%= form_with url: passwords_path, class: "flex flex-col gap-4" do |form| %>
+  <label class="flex flex-col gap-1">
+    <span class="font-medium">Email</span>
+    <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", value: params[:email_address], class: "input input-lg w-full" %>
+  </label>
+
+  <%= form.submit "Email reset instructions", class: "btn btn-primary btn-lg btn-block mt-2" %>
+<% end %>

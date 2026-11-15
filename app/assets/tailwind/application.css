@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+/* daisyUI is vendored as standalone plugin files (no Node build step). */
+@plugin "./daisyui.js" {
+  themes: false;
+}
+
+@plugin "./daisyui-theme.js" {
+  name: "tablemates";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  /* Warm cream surfaces */
+  --color-base-100: oklch(99% 0.008 85);
+  --color-base-200: oklch(96.5% 0.018 85);
+  --color-base-300: oklch(91% 0.03 80);
+  --color-base-content: oklch(27% 0.03 50);
+
+  /* Terracotta */
+  --color-primary: oklch(55% 0.15 38);
+  --color-primary-content: oklch(98.5% 0.01 85);
+  /* Olive */
+  --color-secondary: oklch(48% 0.08 125);
+  --color-secondary-content: oklch(98.5% 0.01 85);
+  /* Saffron */
+  --color-accent: oklch(82% 0.14 82);
+  --color-accent-content: oklch(27% 0.03 50);
+
+  --color-neutral: oklch(32% 0.03 50);
+  --color-neutral-content: oklch(96.5% 0.018 85);
+
+  --color-info: oklch(58% 0.09 235);
+  --color-info-content: oklch(98.5% 0.01 85);
+  --color-success: oklch(55% 0.11 150);
+  --color-success-content: oklch(98.5% 0.01 85);
+  --color-warning: oklch(82% 0.14 82);
+  --color-warning-content: oklch(27% 0.03 50);
+  --color-error: oklch(55% 0.19 25);
+  --color-error-content: oklch(98.5% 0.01 85);
+
+  --radius-selector: 1rem;
+  --radius-field: 0.875rem;
+  --radius-box: 1.25rem;
+  /* Slightly larger than default so every control is a comfortable tap target */
+  --size-selector: 0.28125rem;
+  --size-field: 0.3125rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@theme {
+  --font-display: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+}
+
+@layer base {
+  h1, h2, .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+}

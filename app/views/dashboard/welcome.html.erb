@@ -1,0 +1,21 @@
+<section class="flex flex-col items-center gap-6 pt-10 text-center">
+  <%= render LogoComponent.new(size: 88) %>
+
+  <div>
+    <h1 class="text-4xl font-semibold leading-tight">Dinner together,<br>settled simply.</h1>
+    <p class="mx-auto mt-4 max-w-sm text-lg opacity-80">
+      Invite friends, share out who brings what, and split the cost in the fewest possible payments.
+    </p>
+  </div>
+
+  <div class="flex w-full max-w-sm flex-col gap-3">
+    <%= link_to "Host a party", new_registration_path, class: "btn btn-primary btn-lg btn-block" %>
+    <%= link_to "Sign in", new_session_path, class: "btn btn-ghost btn-block" %>
+  </div>
+
+  <ul class="mt-4 flex w-full max-w-sm flex-col gap-3 text-left">
+    <li class="rounded-box border border-base-300 bg-base-100 p-4"><span class="mr-2">💌</span>Share one link — guests RSVP without an account</li>
+    <li class="rounded-box border border-base-300 bg-base-100 p-4"><span class="mr-2">🥘</span>A live board of who's bringing what</li>
+    <li class="rounded-box border border-base-300 bg-base-100 p-4"><span class="mr-2">🤝</span>One tap to settle up on Venmo</li>
+  </ul>
+</section>
