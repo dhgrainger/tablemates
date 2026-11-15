@@ -9,6 +9,7 @@ class PartiesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Dinner at Alex's"
+    assert_select "title", "Dinner at Alex's · Tablemates"
     assert_select "#guest_list li", 4
     assert_select "a[href=?]", edit_event_path(@event)
   end

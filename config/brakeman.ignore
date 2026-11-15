@@ -1,0 +1,38 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "c355feac01e9bf47673bb977c48a01a505af8caac6014b418aa931674ceb3a6a",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/parties/_details.html.erb",
+      "line": 27,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to(\"Google Calendar\", EventCalendar.new(event).google_url, :class => \"btn btn-sm\", :target => \"_blank\", :rel => \"noopener\")",
+      "render_path": [
+        {
+          "type": "template",
+          "name": "invites/show",
+          "line": 6,
+          "file": "app/views/invites/show.html.erb",
+          "rendered": {
+            "name": "parties/_details",
+            "file": "app/views/parties/_details.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "parties/_details"
+      },
+      "user_input": "EventCalendar.new(event).google_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "False positive: the href is always the fixed https://calendar.google.com/calendar/render prefix; event fields only appear as to_query-encoded parameters (see EventCalendar#google_url and its tests)."
+    }
+  ],
+  "brakeman_version": "ignore"
+}

@@ -28,6 +28,9 @@ local: &local
   port: <%= ENV.fetch("DATABASE_PORT", 5432) %>
   username: <%= ENV.fetch("DATABASE_USER", "postgres") %>
   password: <%= ENV.fetch("DATABASE_PASSWORD", "postgres") %>
+  # libpq's GSS negotiation can crash forked processes on macOS (parallel
+  # tests fork workers); the local container doesn't use it anyway.
+  gssencmode: disable
 
 development:
   <<: *local
