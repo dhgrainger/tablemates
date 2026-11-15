@@ -8,5 +8,6 @@
   <%= render "parties/you", event: @event, invitation: current_invitation %>
   <%= render "parties/invite_link", event: @event if hosting? && @event.planning? %>
   <%= render ContributionBoardComponent.new(event: @event, viewer: current_invitation) %>
+  <%= render "parties/settle_up", event: @event, viewer: current_invitation %>
   <%= render "parties/guests", event: @event, invitations: @invitations %>
 </div>

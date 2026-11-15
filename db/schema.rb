@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_15_222416) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_15_222953) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -96,6 +96,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_15_222416) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "settlements", force: :cascade do |t|
+    t.bigint "event_id", null: false
+    t.bigint "from_invitation_id", null: false
+    t.bigint "to_invitation_id", null: false
+    t.integer "amount_cents", null: false
+    t.datetime "paid_at"
+    t.datetime "confirmed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id"], name: "index_settlements_on_event_id"
+    t.index ["from_invitation_id"], name: "index_settlements_on_from_invitation_id"
+    t.index ["to_invitation_id"], name: "index_settlements_on_to_invitation_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email_address", null: false
     t.string "password_digest", null: false
@@ -114,4 +128,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_15_222416) do
   add_foreign_key "invitations", "events"
   add_foreign_key "invitations", "users"
   add_foreign_key "sessions", "users"
+  add_foreign_key "settlements", "events"
+  add_foreign_key "settlements", "invitations", column: "from_invitation_id"
+  add_foreign_key "settlements", "invitations", column: "to_invitation_id"
 end

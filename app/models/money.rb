@@ -15,10 +15,10 @@ module Money
     match[1].to_i * 100 + match[2].to_s.ljust(2, "0").to_i
   end
 
-  # 123456 => "1,234.56"
-  def self.decimal(cents)
+  # 123456 => "1,234.56" (or "1234.56" with delimiter: "")
+  def self.decimal(cents, delimiter: ",")
     dollars, remainder = cents.abs.divmod(100)
-    whole = dollars.to_s.reverse.scan(/\d{1,3}/).join(",").reverse
+    whole = dollars.to_s.reverse.scan(/\d{1,3}/).join(delimiter).reverse
     "#{'-' if cents.negative?}#{whole}.#{remainder.to_s.rjust(2, '0')}"
   end
 

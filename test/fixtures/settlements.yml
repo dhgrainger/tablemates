@@ -1,0 +1,2 @@
+# Sam's Brunch has not been closed out in fixtures; tests build settlements
+# through Event#close_out! so they always reflect the real algorithm.

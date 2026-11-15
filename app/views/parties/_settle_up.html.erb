@@ -1,0 +1,23 @@
+<%# locals: (event:, viewer:) %>
+<% lines = event.planning? ? SettleUp.for(event).payments : event.settlements.includes(:from_invitation, :to_invitation).order(:id).to_a %>
+<% mine = lines.select { |line| line.from == viewer || line.to == viewer } %>
+<%= render CardComponent.new(title: "Settle up", id: "settle_up") do %>
+  <% if event.planning? %><p class="text-sm opacity-70">Live estimate — updates as costs are logged.</p><% end %>
+
+  <% if mine.any? %>
+    <ul class="flex flex-col gap-1">
+      <% mine.each do |line| %>
+        <li class="font-medium"><%= SettlementLineComponent.new(line: line, viewer: viewer, event: event).headline %></li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="font-medium">You're all square 🎉</p>
+  <% end %>
+
+  <%= link_to party_settle_up_path(event), class: "btn #{event.closed? && mine.any? ? 'btn-primary' : ''} btn-block" do %>
+    <%= if event.planning? then viewer.host? ? "Review and close out" : "See the split"
+        elsif event.closed? then "Settle up"
+        else "View settle-up"
+        end %>
+  <% end %>
+<% end %>

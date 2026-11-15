@@ -1,0 +1,65 @@
+<% content_for :title, "Settle up" %>
+<% turbo_refreshes_with method: :morph, scroll: :preserve %>
+<%= turbo_stream_from @event %>
+
+<div class="flex flex-col gap-4">
+  <div class="flex items-center justify-between gap-3">
+    <div>
+      <h1 class="text-3xl font-semibold">Settle up</h1>
+      <p class="opacity-80"><%= @event.title %></p>
+    </div>
+    <%= link_to "Back", party_path(@event), class: "btn btn-ghost btn-sm" %>
+  </div>
+
+  <% if @event.planning? %>
+    <div role="status" class="alert alert-soft">
+      This is a live estimate. It becomes final when <%= hosting? ? "you close" : "#{@event.host.name.split.first} closes" %> out the party.
+    </div>
+  <% end %>
+
+  <section id="my_settlements" class="flex flex-col gap-3">
+    <% if @my_lines.any? %>
+      <ul class="flex flex-col gap-3">
+        <% @my_lines.each do |line| %>
+          <%= render SettlementLineComponent.new(line: line, viewer: current_invitation, event: @event) %>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="rounded-box border border-base-300 bg-base-100 p-6 text-center">
+        <p class="text-4xl">🎉</p>
+        <p class="mt-2 text-lg font-semibold">You're all square</p>
+        <p class="opacity-70">Nothing to pay, nothing to collect.</p>
+      </div>
+    <% end %>
+
+    <%= render WhyComponent.new(fair_shares: @fair_shares, viewer: current_invitation, event: @event) %>
+  </section>
+
+  <% if hosting? %>
+    <%= render CardComponent.new(title: "Everyone's payments", id: "all_settlements") do %>
+      <% if @lines.any? %>
+        <ul class="flex flex-col gap-2">
+          <% @lines.each do |line| %>
+            <% label, style = SettlementLineComponent.new(line: line, viewer: nil, event: @event).status %>
+            <li class="flex items-center justify-between gap-3">
+              <span><%= line.from.guest_name %> → <%= line.to.guest_name %> <span class="font-semibold tabular-nums"><%= money(line.amount_cents) %></span></span>
+              <span class="badge <%= style %> badge-sm shrink-0 whitespace-nowrap font-medium"><%= label %></span>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="opacity-70">Nobody owes anything<%= " yet" if @event.planning? %>.</p>
+      <% end %>
+
+      <% if @event.planning? %>
+        <%= button_to "Close out party", party_close_out_path(@event), class: "btn btn-primary btn-lg btn-block mt-2",
+              data: { turbo_confirm: "Close out the party? Costs and RSVPs will be locked and everyone will see what to pay." } %>
+        <p class="text-sm opacity-70">Do this once everyone has logged what they spent.</p>
+      <% elsif @event.reopenable? %>
+        <%= button_to "Reopen party", party_close_out_path(@event), method: :delete, class: "btn btn-block mt-2",
+              data: { turbo_confirm: "Reopen the party? These payments will be discarded and recalculated when you close out again." } %>
+        <p class="text-sm opacity-70">You can reopen until someone marks a payment as paid.</p>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

@@ -16,6 +16,14 @@ Rails.application.routes.draw do
       end
       resource :receipt, only: :show
     end
+    resource :settle_up, only: :show
+    resource :close_out, only: %i[ create destroy ]
+    resources :settlements, only: [] do
+      member do
+        patch :pay
+        patch :confirm
+      end
+    end
   end
 
   # Guest access — no accounts. The invite link is shared; /p/ links are personal.

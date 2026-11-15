@@ -1,0 +1,40 @@
+<% label, style = status %>
+<li class="flex flex-col gap-3 rounded-box border border-base-300 p-4" <% if settlement? %>id="<%= dom_id(@line) %>"<% end %>>
+  <div class="flex items-start justify-between gap-3">
+    <p class="text-lg font-semibold leading-snug"><%= headline %></p>
+    <span class="badge <%= style %> badge-sm shrink-0 whitespace-nowrap font-medium"><%= label %></span>
+  </div>
+
+  <% if settlement? && paying? %>
+    <% if @line.confirmed? %>
+      <p class="opacity-80">✅ <%= @line.to.first_name %> confirmed your payment.</p>
+    <% elsif @line.paid? %>
+      <p class="opacity-80">You marked this as paid. Waiting for <%= @line.to.first_name %> to confirm.</p>
+    <% elsif @line.payable? %>
+      <%= link_to "Pay on Venmo", pay_url, class: "btn btn-primary btn-lg btn-block", target: "_blank", rel: "noopener" %>
+      <p class="text-sm opacity-80">
+        Paying @<%= @line.to.venmo_username %> ·
+        <%= link_to "Check it's #{@line.to.first_name}", helpers.venmo_profile_url(@line.to.venmo_username), class: "link", target: "_blank", rel: "noopener" %>
+      </p>
+      <%= button_to "I paid", helpers.pay_party_settlement_path(@event, @line), method: :patch, class: "btn btn-block" %>
+    <% else %>
+      <div role="alert" class="alert alert-soft alert-warning">
+        <%= @line.to.first_name %> hasn't added a Venmo username yet. The pay button will appear here as soon as they do.
+      </div>
+    <% end %>
+  <% elsif settlement? && receiving? %>
+    <% if @line.confirmed? %>
+      <p class="opacity-80">✅ You confirmed this payment.</p>
+    <% elsif @line.paid? %>
+      <p class="opacity-80"><%= @line.from.first_name %> says they've paid. Check Venmo, then confirm.</p>
+      <%= button_to "Got it", helpers.confirm_party_settlement_path(@event, @line), method: :patch, class: "btn btn-primary btn-lg btn-block" %>
+    <% elsif @line.payable? %>
+      <p class="opacity-80">Waiting for <%= @line.from.first_name %> to pay you on Venmo (@<%= @line.to.venmo_username %>).</p>
+    <% else %>
+      <div role="alert" class="alert alert-soft alert-warning flex-col items-stretch">
+        <span><%= @line.from.first_name %> can't pay you until you add your Venmo username.</span>
+        <%= link_to "Add my Venmo username", helpers.edit_party_rsvp_path(@event), class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  <% end %>
+</li>

@@ -1,5 +1,8 @@
 class Event < ApplicationRecord
   belongs_to :host, class_name: "User"
+  class NotAllowed < StandardError; end
+
+  has_many :settlements, dependent: :destroy
   has_many :contributions, dependent: :destroy
   has_many :invitations, dependent: :destroy
   has_one_attached :cover_image
@@ -38,6 +41,37 @@ class Event < ApplicationRecord
 
   def shared_total_cents
     contributions.splittable.sum(:cost_cents)
+  end
+
+  # Freezes the live estimate into Settlement records.
+  def close_out!
+    with_lock do
+      raise NotAllowed, "already closed out" unless planning?
+
+      payments = SettleUp.for(self).payments
+      payments.each do |payment|
+        settlements.create!(from_invitation: payment.from, to_invitation: payment.to, amount_cents: payment.amount_cents)
+      end
+      update!(status: payments.empty? ? :settled : :closed)
+    end
+  end
+
+  # The host can reopen until any settlement has been marked paid.
+  def reopenable?
+    !planning? && settlements.where.not(paid_at: nil).none?
+  end
+
+  def reopen!
+    with_lock do
+      raise NotAllowed, "a payment has already been made" unless reopenable?
+
+      settlements.destroy_all
+      update!(status: :planning)
+    end
+  end
+
+  def mark_settled_if_done!
+    update!(status: :settled) if closed? && settlements.where(confirmed_at: nil).none?
   end
 
   # Dollars-as-text accessor for forms.
