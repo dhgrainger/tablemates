@@ -173,3 +173,130 @@ All four checks (test, test:system, rubocop, brakeman) must pass before committi
 ### Out of scope for the MVP
 
 SMS invites, push notifications, native apps, payment providers other than Venmo, in-app payments, recurring dinner clubs, dietary-preference tracking.
+
+---
+
+# Build results (MVP built 2026-11-15)
+
+All eight slices from the brief are built and committed on the `mvp` branch. `main` holds only the original brief until the owner merges.
+
+### Status of checks (last run)
+
+| Check | Result |
+|---|---|
+| `bin/rails test` | 181 tests, 0 failures |
+| `bin/rails test:system` | 3 tests, 0 failures (headless Chrome, phone viewport; stable over 10 consecutive runs) |
+| `bin/rubocop` | no offenses |
+| `bin/brakeman` | 0 warnings; 1 documented false positive in `config/brakeman.ignore` (Google Calendar link href) |
+
+### Commits on `mvp`
+
+| Commit | Slice |
+|---|---|
+| `fa5d03b` | 1 — app skeleton, host auth, daisyUI theme, layout |
+| `b51ff12` | 2 — events CRUD for hosts |
+| `c007db5` | 3 — invite link, guest RSVP, access-token sessions |
+| `e40af4b` | 4–5 — live contribution board, cost logging, receipts (one commit) |
+| `71c6f2b` | 6 — FairShares and SettleUp services (test-first) |
+| `75cc711` | 7 — close out, settlements, Venmo links, paid/confirmed |
+| `9767c66` | 8 — calendar links, PWA, seeds, system tests, polish |
+
+### Environment that was set up
+
+- Ruby 3.4.12 via rbenv (pinned in `.ruby-version`), Rails 8.1.4.1.
+- PostgreSQL 17 in Docker via `compose.yml` (`localhost:5432`). Docker Desktop must be running and signed in.
+- daisyUI 5.8.1 vendored as `app/assets/tailwind/daisyui.js` and `daisyui-theme.js` — no Node.
+- ViewComponent 4 added to the Gemfile.
+
+### What was built
+
+**Hosts**
+- Sign-up (`RegistrationsController`), sign-in and password reset (Rails 8 authentication generator). `User` has `name` and optional `venmo_username`.
+- Dashboard (`/`) listing the host's upcoming and past parties; strangers see a welcome page.
+- Create / edit / delete a party (`EventsController`, scoped through `Current.user.hosted_events`) with title, date/time, location, description, cover image, and the two splitting options.
+
+**Guests (no accounts)**
+- `GET /i/:invite_token` — public invite page with details and RSVP form (name, optional email, Venmo username, yes/maybe/no).
+- `GET /p/:access_token` — personal link. It stores the token in a signed, permanent, http-only cookie (keyed by event id, so one device can attend several parties) and redirects to `/parties/:id`.
+- `PartyAccess` concern resolves the viewer's own `Invitation` from the host session or the guest cookie and 404s for anyone else. Every party-scoped controller uses it and loads records through `@event`.
+- Guests can change their own RSVP and details; replies freeze after close-out, but a Venmo username can still be added.
+
+**Party page (`/parties/:id`)**
+- Details, the viewer's own RSVP card, invite link with copy button (host only), contribution board, settle-up summary, guest list with RSVP badges.
+- Live updates: `Event` uses `broadcasts_refreshes`; invitations, contributions and settlements `touch` the event; the page subscribes with `turbo_stream_from` and morphs in place. Verified in two browser tabs.
+- The Action Cable connection is open to guests; subscriptions are authorised by Turbo's signed stream names.
+
+**Contribution board**
+- Grouped by category (mains, sides, drinks, dessert, everything else) with a running shared total.
+- Host lists needed items; guests tap "I'll bring it", add their own, hand an item back, or remove it.
+- Cost entered in dollars and stored as integer cents (max $10,000); "It's a gift" excludes it from the split; optional receipt photo.
+- Only the person bringing an item, or the host, can edit it. The board is frozen once the party is closed out.
+- Receipts are streamed through `ReceiptsController` behind the party access check, not linked by public Active Storage URL.
+
+**Settle-up**
+- `app/services/fair_shares.rb` — divmod split, extra cents to the first attendees by id, balances asserted to sum to zero.
+- `app/services/settle_up.rb` — exact-match pairing, then greedy largest-debtor-pays-largest-creditor; at most n−1 payments; returns `SettleUp::Payment`.
+- Options: round to whole dollars (host absorbs the difference) and forgive payments under a threshold.
+- Live estimate while planning. "Close out party" (host) writes fixed `Settlement` records; the host can reopen until any settlement is marked paid. A party with nothing owed goes straight to `settled`.
+- Settle-up screen: each person sees only their own payments plus an expandable "Why?" breakdown; the host also sees everyone's payments and their status.
+
+**Venmo**
+- `PaymentsHelper#venmo_pay_url` builds the pre-filled link; `venmo_profile_url` powers "Check it's …"; note text is "🍝 <title> – <Mon D>".
+- Usernames are normalised (whitespace and leading `@` stripped) and format-validated in the `VenmoUsername` concern.
+- Payer taps "I paid" (`paid_at`), recipient taps "Got it" (`confirmed_at`); when all are confirmed the party becomes `settled`.
+- If the creditor has no Venmo username the settlement is blocked: the payer sees a notice, the creditor a prompt to add one.
+
+**Other**
+- `.ics` download and "Add to Google Calendar" link (`EventCalendar`, `CalendarsController`).
+- PWA: manifest, app icon, network-only service worker registered from `application.js`.
+- Original "tablemates" daisyUI theme (cream / terracotta / olive / saffron), two-plates logo, serif display headings, mobile-first single column.
+- ViewComponents in `app/components`: logo, flash, form errors, avatar, card, status badge, RSVP badge, event card, copy button, contribution board and row, settlement line, why.
+- Seeds: demo host, a party in planning (4 guests, costs, a gift, unclaimed items) and a past party part-way through settling up. Demo credentials are in `db/seeds.rb` and the README only.
+
+### Routes at a glance
+
+| Path | Who | Purpose |
+|---|---|---|
+| `/` | anyone | welcome page, or the host's dashboard |
+| `/registration/new`, `/session/new`, `/passwords/new` | anyone | host sign-up, sign-in, password reset |
+| `/events/new`, `/events/:id/edit` | host | create / edit / delete a party |
+| `/i/:invite_token` | anyone with the link | invite page and RSVP |
+| `/p/:access_token` | that guest | personal link → remembers the guest, redirects to the party |
+| `/parties/:id` | host + guests | party page |
+| `/parties/:id/rsvp/edit` | host + guests | own RSVP and details |
+| `/parties/:id/contributions/…` | host + guests | add, edit, claim, unclaim, remove; `/receipt` to view a photo |
+| `/parties/:id/settle_up` | host + guests | estimate or settlements |
+| `/parties/:id/close_out` | host | POST closes out, DELETE reopens |
+| `/parties/:id/settlements/:id/pay`, `/confirm` | payer / recipient | "I paid" / "Got it" |
+| `/parties/:id/calendar.ics` | host + guests | calendar download |
+
+### Decisions that differ from, or go beyond, the brief
+
+- **Personal link redirects.** `/p/:access_token` sets the cookie and redirects to `/parties/:id` instead of rendering the party itself, so the token doesn't stay in the address bar, history or screenshots.
+- **Rounding is applied to balances, not payments.** Each non-host balance is rounded to the nearest dollar and the host's balance takes the slack. Every payment is then a whole dollar and the host really does absorb the difference.
+- **Venmo amount is built from integer cents** (`Money.decimal`) rather than `amount_cents / 100.0`, to keep the no-floats rule. Same output.
+- **Forms live on their own pages** (add/edit item, edit RSVP) so a live refresh can't disturb a form mid-typing.
+- **Non-attending payers** — someone who paid for a shared item but isn't marked as going has no share and is reimbursed in full.
+- **Unclaimed items can't carry a cost**, and an item with a logged cost can't be handed back until the cost is cleared.
+- **Uploads are sniffed from their bytes** (`ImageAttachmentValidator`); the filename and the browser's claimed content type are not trusted. Cover ≤ 5 MB, receipt ≤ 10 MB; PNG, JPEG, WebP, GIF.
+- **A party is capped at 150 invitations**, and RSVP / personal-link endpoints are rate-limited.
+- **Project context lives in this file.** The repo's `CLAUDE.md` is only a pointer here.
+
+### Things to know
+
+- **Parallel test crash on macOS.** The unit suite hung once and segfaulted once (libpq GSS negotiation in forked workers). `gssencmode: disable` was added to the local database config; it passed every run afterwards, but the crash was intermittent so that is not proof.
+- **System-test flakiness, fixed.** Chrome's password-manager and autofill popups were swallowing clicks; they are disabled in `test/application_system_test_case.rb`.
+- **Time zone.** Party times are entered and shown in one app-wide zone, default US Eastern (`APP_TIME_ZONE`).
+- **Images are served at original size** — libvips isn't installed, so no variants are generated.
+- **Adding a new top-level directory under `app/`** (as happened with `app/services` and `app/validators`) needs a dev-server restart.
+- **Re-running `bin/rails db:seed`** rebuilds the demo parties, so previously printed guest links stop working.
+
+### Not built yet
+
+- The host can't remove a guest.
+- Nothing is emailed to guests (the optional email is only stored); password-reset mail has no delivery configured.
+- A payer can't undo "I paid".
+- Per-party or per-viewer time zones.
+- Image resizing / thumbnails.
+- Production deployment: the Kamal config and production settings are the generated defaults.
+- Everything listed as out of scope in the brief (SMS invites, push notifications, native apps, other payment providers, in-app payments, recurring clubs, dietary tracking).
